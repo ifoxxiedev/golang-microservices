@@ -1,20 +1,28 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"net/http"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 )
 
+const webPort = "80"
+
+type Config struct{}
+
 func main() {
+	app := Config{}
+	log.Printf("Starting server on port %s\n", webPort)
 
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
+	// define http server
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%s", webPort),
+		Handler: app.routes(),
+	}
 
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello, World!"))
-	})
-
-	http.ListenAndServe(":8080", r)
+	// start http server
+	err := srv.ListenAndServe()
+	if err != nil {
+		log.Fatalf("server failed to start: %v", err)
+	}
 }
