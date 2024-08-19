@@ -14,7 +14,7 @@ type jsonResponse struct {
 }
 
 func (app *Config) readJson(w http.ResponseWriter, r *http.Request, data any) error {
-	maxBytes := 1048576 // one megabyte(1mb)
+	maxBytes := 1048576 // one megabyte(1mb) in bytes
 
 	// limit the size of the request body to maxBytes (Owww craaazy, read only 1mb of request body)
 	// see docs: https://pkg.go.dev/net/http#MaxBytesReader

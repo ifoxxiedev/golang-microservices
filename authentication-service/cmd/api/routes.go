@@ -9,8 +9,8 @@ import (
 )
 
 func (app *Config) routes() http.Handler {
-
 	mux := chi.NewRouter()
+
 	mux.Use(middleware.Logger)
 	mux.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
@@ -22,8 +22,6 @@ func (app *Config) routes() http.Handler {
 	}))
 
 	mux.Use(middleware.Heartbeat("/ping"))
-
-	mux.Post("/", app.Broker)
 
 	return mux
 }
