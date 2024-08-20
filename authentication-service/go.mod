@@ -15,6 +15,7 @@ require (
 	github.com/jackc/pgx v3.6.2+incompatible // indirect
 	github.com/jackc/pgx/v4 v4.18.3 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
+	github.com/tsawler/toolbox v1.3.1 // indirect
 	golang.org/x/crypto v0.20.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 )

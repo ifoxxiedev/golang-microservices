@@ -16,8 +16,6 @@ type jsonResponse struct {
 func (app *Config) readJson(w http.ResponseWriter, r *http.Request, data any) error {
 	maxBytes := 1048576 // one megabyte(1mb) in bytes
 
-	// limit the size of the request body to maxBytes (Owww craaazy, read only 1mb of request body)
-	// see docs: https://pkg.go.dev/net/http#MaxBytesReader
 	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
 
 	dec := json.NewDecoder(r.Body)
@@ -27,7 +25,6 @@ func (app *Config) readJson(w http.ResponseWriter, r *http.Request, data any) er
 		return err
 	}
 
-	// Oww craaazy, this checks if the body has leastwise one key and value in JSON payload
 	err = dec.Decode(&struct{}{})
 	if err != io.EOF {
 		return errors.New("body must only have a single JSON value")
@@ -38,6 +35,7 @@ func (app *Config) readJson(w http.ResponseWriter, r *http.Request, data any) er
 
 func (app *Config) writeJson(w http.ResponseWriter, status int, data any, headers ...http.Header) error {
 	out, err := json.MarshalIndent(data, "", "\t")
+
 	if err != nil {
 		return err
 	}
