@@ -75,7 +75,7 @@ func connectToDB() *sql.DB {
 		}
 
 		if counts > maxCounts {
-			log.Printf("Postgres is not ready after 10 tries. Exiting... %v\n", err)
+			log.Printf("Postgres is not ready after 10 attempts. Exiting... %v\n", err)
 			return nil
 		}
 
