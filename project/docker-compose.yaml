@@ -39,6 +39,8 @@ services:
       context: ./../broker-service
       dockerfile: ./../broker-service/broker-service.dockerfile
     restart: on-failure
+    environment:
+      AUTH_SERVICE_URL: "http://authentication-service:8081"
     ports:
       - "8080:80"
     deploy:
