@@ -1,1 +1,8 @@
+.env*
+!.env.example
+
 project/db-data
+tmp
+logs
+
+

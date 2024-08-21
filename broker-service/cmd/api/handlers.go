@@ -80,7 +80,7 @@ func (app *Config) authenticate(w http.ResponseWriter, a AuthPayload) {
 	}
 
 	if response.StatusCode != http.StatusAccepted {
-		app.errorJson(w, errors.New("error calling auth service"), response.StatusCode)
+		app.errorJson(w, err, response.StatusCode)
 		return
 	}
 

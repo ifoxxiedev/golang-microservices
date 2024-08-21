@@ -12,9 +12,11 @@ import (
 	_ "github.com/jackc/pgconn"
 	_ "github.com/jackc/pgx/v4"
 	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/joho/godotenv"
+	"golang.org/x/crypto/bcrypt"
 )
 
-const webPort = "80"
+const webPort = "8081"
 
 type Config struct {
 	DB     *sql.DB
@@ -23,6 +25,14 @@ type Config struct {
 
 var counts int64
 var maxCounts int64 = 10
+
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+}
 
 func main() {
 	log.Println("Starting the authentication service")
@@ -42,6 +52,9 @@ func main() {
 		Addr:    fmt.Sprintf(":%s", webPort),
 		Handler: app.routes(),
 	}
+
+	password, _ := bcrypt.GenerateFromPassword([]byte("verysecret"), 12)
+	fmt.Println("Admin password", string(password))
 
 	err := srv.ListenAndServe()
 	if err != nil {

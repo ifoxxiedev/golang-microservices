@@ -40,7 +40,7 @@ services:
       dockerfile: ./../broker-service/broker-service.dockerfile
     restart: on-failure
     environment:
-      AUTH_SERVICE_URL: "http://authentication-service:8081"
+      AUTH_SERVICE_URL: "http://authentication-service"
     ports:
       - "8080:80"
     deploy:
