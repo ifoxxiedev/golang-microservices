@@ -14,9 +14,15 @@ type AuthPayload struct {
 	Password string `json:"password"`
 }
 
+type LogPayload struct {
+	Name string `json:"level"`
+	Data string `json:"message"`
+}
+
 type RequestPayload struct {
 	Action string      `json:"action"`
 	Auth   AuthPayload `json:"auth,omityempty"`
+	Log    LogPayload  `json:"log,omitempty"`
 }
 
 func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
@@ -40,9 +46,53 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	switch requestPayload.Action {
 	case "auth":
 		app.authenticate(w, requestPayload.Auth)
+	case "log":
+		app.logItem(w, requestPayload.Log)
 	default:
 		app.errorJson(w, errors.New("unknown action"), http.StatusBadRequest)
 	}
+}
+
+func (app *Config) logItem(w http.ResponseWriter, l LogPayload) {
+	// create some json we'll send to auth microservice
+	jsonData, _ := json.MarshalIndent(l, "", "\t")
+
+	// call the sevice
+	url := fmt.Sprintf("%s/log", os.Getenv("LOGGER_SERVICE_URL"))
+
+	request, err := http.NewRequest(
+		"POST",
+		url,
+		bytes.NewBuffer(jsonData),
+	)
+
+	if err != nil {
+		app.errorJson(w, err, http.StatusBadRequest)
+		return
+	}
+
+	request.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+
+	if err != nil {
+		app.errorJson(w, err, http.StatusBadRequest)
+		return
+	}
+
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		app.errorJson(w, err, response.StatusCode)
+		return
+	}
+
+	var payload jsonResponse
+	payload.Error = false
+	payload.Message = "Logged"
+
+	app.writeJson(w, http.StatusAccepted, payload)
 }
 
 func (app *Config) authenticate(w http.ResponseWriter, a AuthPayload) {
@@ -62,6 +112,8 @@ func (app *Config) authenticate(w http.ResponseWriter, a AuthPayload) {
 		app.errorJson(w, err, http.StatusBadRequest)
 		return
 	}
+
+	request.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
 	response, err := client.Do(request)
