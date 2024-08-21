@@ -61,3 +61,16 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+
+  logger-service:
+    build:
+      context: ./../logger-service
+      dockerfile: ./../logger-service/logger-service.dockerfile
+    restart: on-failure
+    environment:
+      MONGO_URL: "mongodb://mongo:27017"
+    ports:
+      - "8082:80"
+    deploy:
+      mode: replicated
+      replicas: 1

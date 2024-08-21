@@ -6,6 +6,7 @@ import (
 	"log"
 	"log-service/cmd/data"
 	"net/http"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,11 +16,11 @@ import (
 const (
 	webPort               = "80"
 	rpcPort               = "5001"
-	mongoURL              = "mongodb://mongo:27017"
 	maxConnectionAttempts = 10
 	gRpcPort              = "50001"
 )
 
+var mongoURL string
 var client *mongo.Client
 var counts int64
 
@@ -29,6 +30,7 @@ type Config struct {
 
 func main() {
 	// connect to mongo
+	mongoURL = os.Getenv("MONGO_URL")
 	mongoClient, err := connectToDB()
 
 	if err != nil {
