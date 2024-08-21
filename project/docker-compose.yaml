@@ -42,6 +42,7 @@ services:
       dockerfile: ./../authentication-service/authentication-service.dockerfile
     restart: on-failure
     environment:
+      LOGGER_SERVICE_URL: "http://logger-service"
       DSN: "host=postgres port=5432 dbname=users user=postgres password=password sslmode=disable timezone=UTC connect_timeout=5"
     ports:
       - "8081:80"
