@@ -1,0 +1,9 @@
+POST http://localhost:80/send
+Content-Type: application/json
+
+{
+  "from": "jhon.smith2@example.com",
+  "to": "x@exmaple.com",
+  "subject": "Hello World",
+  "message": "Hello"
+}

@@ -1,4 +1,3 @@
-version: '3'
 services:
   mail:
     image: mailhog/mailhog:latest
@@ -79,6 +78,26 @@ services:
       MONGO_URL: "mongodb://mongo:27017"
     ports:
       - "8082:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  mail-service:
+    build:
+      context: ./../mail-service
+      dockerfile: ./../mail-service/mail-service.dockerfile
+    restart: on-failure
+    environment:
+      MAIL_DOMAIN: "localhost"
+      MAIL_HOST: "mail"
+      MAIL_PORT: 1025
+      MAIL_ENCRYPTION: "none"
+      MAIL_USERNAME: ""
+      MAIL_PASSWORD: ""
+      MAIL_FROM_NAME: "Jhon Smith"
+      MAIL_FROM_ADDRESS: "jhon.smith@example.com"
+    ports:
+      - "8083:80"
     deploy:
       mode: replicated
       replicas: 1
