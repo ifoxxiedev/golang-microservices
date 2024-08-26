@@ -4,9 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
-	"log"
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/vanng822/go-premailer/premailer"
@@ -48,16 +45,16 @@ func (m *Mail) SendSMTPEmail(msg Message) error {
 	}
 
 	msg.DataMap = data
-	// formattedMessage, err := m.buildHTMLMessage(msg)
+	formattedMessage, err := m.buildHTMLMessage(msg)
 
-	// if err != nil {
-	// 	return err
-	// }
+	if err != nil {
+		return err
+	}
 
-	// plaiMessage, err := m.buildPlainTextMessage(msg)
-	// if err != nil {
-	// 	return err
-	// }
+	plaiMessage, err := m.buildPlainTextMessage(msg)
+	if err != nil {
+		return err
+	}
 
 	server := mail.NewSMTPClient()
 	server.Host = m.Host
@@ -79,8 +76,8 @@ func (m *Mail) SendSMTPEmail(msg Message) error {
 		AddTo(msg.To).
 		SetSubject(msg.Subject)
 
-	email.SetBody(mail.TextPlain, msg.Data.(string))
-	email.AddAlternative(mail.TextHTML, msg.Data.(string))
+	email.SetBody(mail.TextPlain, plaiMessage)
+	email.AddAlternative(mail.TextHTML, formattedMessage)
 
 	if len(msg.Attachments) > 0 {
 		for _, attachment := range msg.Attachments {
@@ -122,17 +119,20 @@ func (m *Mail) buildPlainTextMessage(msg Message) (string, error) {
 }
 
 func (m *Mail) geTemplatePath(name string) string {
-	pwd, _ := os.Getwd()
-	currentDir, err := filepath.Abs(pwd)
+	// pwd, _ := os.Getwd()
+	// currentDir, err := filepath.Abs(pwd)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	templatePath := filepath.Join(currentDir, "templates", name)
-	fmt.Println("loading template from: ", templatePath)
+	// templatePath := filepath.Join(currentDir, "templates", name)
+	// fmt.Println("loading template from: ", templatePath)
 
-	return templatePath
+	// return templatePath
+
+	// Na hora que executar, ./, é a raiz do O.S no caso do linux
+	return fmt.Sprintf("./templates/%s", name)
 }
 
 func (m *Mail) buildHTMLMessage(msg Message) (string, error) {
