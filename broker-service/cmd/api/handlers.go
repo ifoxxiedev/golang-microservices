@@ -14,6 +14,13 @@ type AuthPayload struct {
 	Password string `json:"password"`
 }
 
+type MailPayload struct {
+	From    string `json:"from"`
+	To      string `json:"to"`
+	Subject string `json:"subject"`
+	Message string `json:"message"`
+}
+
 type LogPayload struct {
 	Name string `json:"level"`
 	Data string `json:"message"`
@@ -23,6 +30,7 @@ type RequestPayload struct {
 	Action string      `json:"action"`
 	Auth   AuthPayload `json:"auth,omityempty"`
 	Log    LogPayload  `json:"log,omitempty"`
+	Mail   MailPayload `json:"mail,omitempty"`
 }
 
 func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
@@ -48,9 +56,53 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 		app.authenticate(w, requestPayload.Auth)
 	case "log":
 		app.logItem(w, requestPayload.Log)
+	case "mail":
+		app.sendMail(w, requestPayload.Mail)
 	default:
 		app.errorJson(w, errors.New("unknown action"), http.StatusBadRequest)
 	}
+}
+
+func (app *Config) sendMail(w http.ResponseWriter, m MailPayload) {
+	// create some json we'll send to mail microservice
+	jsonData, _ := json.MarshalIndent(m, "", "\t")
+
+	// call the sevice
+	url := fmt.Sprintf("%s/send", os.Getenv("MAIL_SERVICE_URL"))
+
+	request, err := http.NewRequest(
+		"POST",
+		url,
+		bytes.NewBuffer(jsonData),
+	)
+
+	if err != nil {
+		app.errorJson(w, err, http.StatusBadRequest)
+		return
+	}
+
+	request.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+
+	if err != nil {
+		app.errorJson(w, err, http.StatusBadRequest)
+		return
+	}
+
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		app.errorJson(w, errors.New("error calling mail service"))
+		return
+	}
+
+	var payload jsonResponse
+	payload.Error = false
+	payload.Message = "Message sent to " + m.To
+
+	app.writeJson(w, http.StatusAccepted, payload)
 }
 
 func (app *Config) logItem(w http.ResponseWriter, l LogPayload) {

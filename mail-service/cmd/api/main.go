@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+
+	"github.com/joho/godotenv"
 )
 
 const (
@@ -17,6 +19,7 @@ type Config struct {
 }
 
 func main() {
+	godotenv.Load()
 
 	app := Config{Mailer: createMail()}
 	log.Println("Starting mail service on port", webPort)

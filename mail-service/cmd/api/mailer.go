@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -47,16 +48,16 @@ func (m *Mail) SendSMTPEmail(msg Message) error {
 	}
 
 	msg.DataMap = data
-	formattedMessage, err := m.buildHTMLMessage(msg)
+	// formattedMessage, err := m.buildHTMLMessage(msg)
 
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 
-	plaiMessage, err := m.buildPlainTextMessage(msg)
-	if err != nil {
-		return err
-	}
+	// plaiMessage, err := m.buildPlainTextMessage(msg)
+	// if err != nil {
+	// 	return err
+	// }
 
 	server := mail.NewSMTPClient()
 	server.Host = m.Host
@@ -78,8 +79,8 @@ func (m *Mail) SendSMTPEmail(msg Message) error {
 		AddTo(msg.To).
 		SetSubject(msg.Subject)
 
-	email.SetBody(mail.TextPlain, plaiMessage)
-	email.AddAlternative(mail.TextHTML, formattedMessage)
+	email.SetBody(mail.TextPlain, msg.Data.(string))
+	email.AddAlternative(mail.TextHTML, msg.Data.(string))
 
 	if len(msg.Attachments) > 0 {
 		for _, attachment := range msg.Attachments {
@@ -121,7 +122,9 @@ func (m *Mail) buildPlainTextMessage(msg Message) (string, error) {
 }
 
 func (m *Mail) geTemplatePath(name string) string {
-	currentDir, err := filepath.Abs(".")
+	pwd, _ := os.Getwd()
+	currentDir, err := filepath.Abs(pwd)
+
 	if err != nil {
 		log.Fatal(err)
 	}
