@@ -7,13 +7,15 @@ import (
 	"net/http"
 )
 
+const webPort = 8079
+
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		render(w, "test.page.gohtml")
 	})
 
-	fmt.Println("Starting front end service on port 80")
-	err := http.ListenAndServe(":80", nil)
+	fmt.Printf("Starting front end service on port %v\n", webPort)
+	err := http.ListenAndServe(fmt.Sprintf(":%v", webPort), nil)
 	if err != nil {
 		log.Panic(err)
 	}

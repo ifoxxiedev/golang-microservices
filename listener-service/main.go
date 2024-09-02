@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"listener/event"
 	"log"
 	"math"
 	"os"
@@ -14,17 +15,26 @@ func main() {
 	// try to connect rabbitmq
 	rabbitConn, err := connect()
 	if err != nil {
-		log.Println(err)
-		os.Exit(1)
+		exitApp(err)
 	}
 
 	defer rabbitConn.Close()
 
 	// start listening for messages
+	log.Println("Listening and consuming RabbitMQ messages...")
 
 	// create consumer
+	consumer, err := event.NewConsumer(rabbitConn)
+	if err != nil {
+		panic(err)
+	}
 
 	// watch the queue and consume events
+
+	err = consumer.Listen([]string{"log.INFO", "log.WARNING", "log.ERROR"})
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func connect() (*amqp.Connection, error) {
@@ -35,11 +45,12 @@ func connect() (*amqp.Connection, error) {
 
 	// don't continue until we have a connection
 	for {
-		c, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+		c, err := amqp.Dial(os.Getenv("RABBITMQ_URL"))
 		if err != nil {
 			fmt.Println("RabbitMQ not yeat ready", backOff)
 			counts++
 		} else {
+			log.Println("Connected to RabbitMQ")
 			connection = c
 			break
 		}
@@ -55,6 +66,14 @@ func connect() (*amqp.Connection, error) {
 		continue
 	}
 
-	log.Println("Connected to RabbitMQ")
 	return connection, nil
+}
+
+func exitApp(err error) {
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	} else {
+		os.Exit(0)
+	}
 }

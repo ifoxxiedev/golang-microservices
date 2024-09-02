@@ -6,7 +6,7 @@ services:
       - "1025:1025"
 
   rabbitmq:
-    image: 'rabbitmq:3.9-alpine'
+    image: "rabbitmq:3.9-alpine"
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -22,10 +22,10 @@ services:
       PGADMIN_DEFAULT_EMAIL: dba@email.com
       PGADMIN_DEFAULT_PASSWORD: q1w2e3r4
     ports:
-      - 8085:80 
+      - 8085:80
 
   postgres:
-    image: 'postgres:14.0'
+    image: "postgres:14.0"
     ports:
       - "5432:5432"
     deploy:
@@ -39,7 +39,7 @@ services:
       - ./db-data/postgres/:/var/lib/postgresql/data/
 
   mongo:
-    image: 'mongo:4.2.16-bionic'
+    image: "mongo:4.2.16-bionic"
     ports:
       - "27017:27017"
     deploy:
@@ -75,8 +75,25 @@ services:
       AUTH_SERVICE_URL: "http://authentication-service"
       LOGGER_SERVICE_URL: "http://logger-service"
       MAIL_SERVICE_URL: "http://mail-service"
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
     ports:
       - "8080:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  listener-service:
+    build:
+      context: ./../listener-service
+      dockerfile: ./../listener-service/listener-service.dockerfile
+    restart: on-failure
+    environment:
+      AUTH_SERVICE_URL: "http://authentication-service"
+      LOGGER_SERVICE_URL: "http://logger-service"
+      MAIL_SERVICE_URL: "http://mail-service"
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+    ports:
+      - "8084:80"
     deploy:
       mode: replicated
       replicas: 1
