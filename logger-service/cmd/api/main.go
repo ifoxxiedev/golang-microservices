@@ -58,6 +58,9 @@ func main() {
 	err = rpc.Register(new(RPCServer))
 	go config.rpcListen()
 
+	// Registert gRPC Server
+	go config.gRPCListen()
+
 	// Register HTTP Server
 	config.httoListen()
 
