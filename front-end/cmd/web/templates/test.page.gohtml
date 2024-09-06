@@ -8,8 +8,9 @@
               <hr>
               <a id="brokerBtn" class="btn btn-outline-secondary" href="javascript:void(0);" >Test Broker</a>
               <a id="authBrokerBtn" class="btn btn-outline-secondary" href="javascript:void(0);" >Test Auth</a>
-               <a id="logBtn" class="btn btn-outline-secondary" href="javascript:void(0);" >Test Log</a>
-               <a id="mailBtn" class="btn btn-outline-secondary" href="javascript:void(0);" >Test Mail</a>
+              <a id="logBtn" class="btn btn-outline-secondary" href="javascript:void(0);" >Test Log</a>
+              <a id="mailBtn" class="btn btn-outline-secondary" href="javascript:void(0);" >Test Mail</a>
+              <a id="logGrpcBtn" class="btn btn-outline-secondary" href="javascript:void(0);" >Test gRPC Log</a>
 
 
               <div id="output" class="mt-5" style="outline: 1px solid silver; padding: 2em;">
@@ -40,6 +41,7 @@
       let authBrokerBtn = document.getElementById('authBrokerBtn');
       let logBtn = document.getElementById('logBtn');
       let mailBtn = document.getElementById('mailBtn');
+      let logGrpcBtn = document.getElementById('logGrpcBtn');
 
       let output = document.getElementById('output');
       let sent = document.getElementById('payload');
@@ -82,6 +84,44 @@
           console.log(err);
           output.innerHTML += `<br /><br /><strong>Error:</strong> ${err}`;
         }
+      });
+
+      logGrpcBtn.addEventListener('click', async () => {
+        const payload = {
+          action: 'log',
+          log: {
+            level: 'event',
+            message: 'Some kind of gRPC data'
+          }
+        }
+
+        const headers = {
+          'Content-Type': 'application/json',
+        }
+
+        const body = {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers,
+        }
+        
+        try {
+          let response = await fetch('http://localhost:8080/log-grpc', body);
+          let result = await response.json();
+
+          sent.innerHTML = JSON.stringify(body, null, 4);
+          received.innerHTML = JSON.stringify(result, null, 4);
+
+          if (result.error) {
+            output.innerHTML += `<br /><strong>Error:</strong> ${result.message}`;
+          } else {
+            output.innerHTML += `<br /><strong>Response from broker service</strong>: ${result.message}`;
+          }
+        } catch(err) {
+          console.log(err);
+          output.innerHTML += `<br /><br /><strong>Error:</strong> ${err}`;
+        }
+
       });
 
       logBtn.addEventListener('click', async () => {
