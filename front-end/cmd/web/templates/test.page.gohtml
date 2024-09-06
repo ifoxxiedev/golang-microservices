@@ -87,9 +87,9 @@
       logBtn.addEventListener('click', async () => {
         const payload = {
           action: 'log',
-          auth: {
-            name: 'event',
-            data: 'Some kind of data'
+          log: {
+            level: 'event',
+            message: 'Some kind of data'
           }
         }
 

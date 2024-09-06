@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 	"log-service/cmd/data"
+	"net"
 	"net/http"
+	"net/rpc"
 	"os"
 	"time"
 
@@ -52,13 +54,35 @@ func main() {
 	models := data.New(client)
 	config := Config{Models: models}
 
-	// start web server
-	config.serve()
+	// Register RPC Server
+	err = rpc.Register(new(RPCServer))
+	go config.rpcListen()
 
-	// start grpc server
+	// Register HTTP Server
+	config.httoListen()
+
 }
 
-func (app *Config) serve() {
+func (app *Config) rpcListen() error {
+	log.Println("Starting RPC Server on port ", rpcPort)
+	listen, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", rpcPort))
+	if err != nil {
+		return err
+	}
+
+	defer listen.Close()
+
+	for {
+		rpcConn, err := listen.Accept()
+		if err != nil {
+			continue
+		}
+
+		go rpc.ServeConn(rpcConn)
+	}
+}
+
+func (app *Config) httoListen() {
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", webPort),
 		Handler: app.routes(),
