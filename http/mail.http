@@ -7,3 +7,12 @@ Content-Type: application/json
   "subject": "Hello World",
   "message": "Hello"
 }
+
+### Authenticate
+POST http://127.0.0.1:8081/authenticate
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "verysecret"
+}
