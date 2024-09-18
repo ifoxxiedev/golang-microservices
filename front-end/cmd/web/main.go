@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 )
 
 const webPort = 8081
@@ -26,7 +27,6 @@ func main() {
 var templateFS embed.FS
 
 func render(w http.ResponseWriter, t string) {
-
 	partials := []string{
 		"templates/base.layout.gohtml",
 		"templates/header.partial.gohtml",
@@ -35,7 +35,6 @@ func render(w http.ResponseWriter, t string) {
 
 	var templateSlice []string
 	templateSlice = append(templateSlice, fmt.Sprintf("templates/%s", t))
-
 	for _, x := range partials {
 		templateSlice = append(templateSlice, x)
 	}
@@ -46,7 +45,10 @@ func render(w http.ResponseWriter, t string) {
 		return
 	}
 
-	if err := tmpl.Execute(w, nil); err != nil {
+	var data map[string]interface{} = make(map[string]interface{})
+	data["BrokerURL"] = os.Getenv("BROKER_URL")
+
+	if err := tmpl.Execute(w, data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

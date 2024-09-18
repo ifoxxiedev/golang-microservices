@@ -1,4 +1,18 @@
 services:
+  caddy:
+    image: obededoreto/micro-caddy:1.0.0
+    restart: on-failure
+    ports:
+      - "8079:80"
+      - "80:80"
+      - "443:443"
+    deploy:
+      mode: replicated
+      replicas: 1
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
   authentication-service:
     image: obededoreto/authentication-service:1.0.0
     restart: on-failure
@@ -49,10 +63,12 @@ services:
       replicas: 1
 
   front-end:
-    image: obededoreto/front-end:1.0.0
+    image: obededoreto/front-end:1.0.2
     restart: on-failure
     ports:
       - "8081:8081"
+    environment:
+      BROKER_URL: "http://broker"
     deploy:
       mode: replicated
       replicas: 1
@@ -95,7 +111,7 @@ services:
       - 8085:80
 
   postgres:
-    image: "postgres:14.0"
+    image: "postgres:14.2"
     ports:
       - "5432:5432"
     deploy:
@@ -127,3 +143,8 @@ services:
     ports:
       - "8025:8025"
       - "1025:1025"
+
+volumes:
+  caddy_data:
+    external: true
+  caddy_config:

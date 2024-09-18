@@ -44,10 +44,29 @@ $ docker push obededoreto/listener-service:1.0.0
 
 ## Building frontends (Docker image)
 
+1. Building front end application
+
 ```
 $ cd front-end
-$ docker build -f front-end.dockerfile -t obededoreto/front-end:1.0.0 .
-$ docker push obededoreto/front-end:1.0.0
+$ docker build -f front-end.dockerfile -t obededoreto/front-end:1.0.2 .
+$ docker push obededoreto/front-end:1.0.2
+```
+
+2. Building caddy proxy
+
+```
+$ cd project
+$ docker build -f caddy.dockerfile -t obededoreto/micro-caddy:1.0.0 .
+$ docker push obededoreto/micro-caddy:1.0.0
+```
+
+3. Configure etc hosts
+
+```sh
+sudo vim /etc/hosts
+
+127.0.0.1 localhost backend
+::1       localhost backend
 ```
 
 ## Creating the stack file (docker-stack.yaml)
