@@ -451,3 +451,17 @@ $ sudo docker stack deploy -c docker-stack.yaml myapp
 ```sh
 $ docker service ls
 ```
+
+### Guides
+
+- Gluster, share volumes
+
+```
+https://www.gluster.org/install/
+```
+
+- Mount volumes with ssh
+
+```
+https://phoenixnap.com/kb/sshfs
+```
