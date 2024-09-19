@@ -30,8 +30,8 @@ $ docker push obededoreto/authentication-service:1.0.0
 
 ```
 $ cd broker-service
-$ docker build -f broker-service.dockerfile -t obededoreto/broker-service:1.0.1 .
-$ docker push obededoreto/broker-service:1.0.1
+$ docker build -f broker-service.dockerfile -t obededoreto/broker-service:1.0.2 .
+$ docker push obededoreto/broker-service:1.0.2
 ```
 
 5. Building listener-service
@@ -48,8 +48,8 @@ $ docker push obededoreto/listener-service:1.0.0
 
 ```
 $ cd front-end
-$ docker build -f front-end.dockerfile -t obededoreto/front-end:1.0.2 .
-$ docker push obededoreto/front-end:1.0.2
+$ docker build -f front-end.dockerfile -t obededoreto/front-end:1.0.3 .
+$ docker push obededoreto/front-end:1.0.3
 ```
 
 2. Building caddy proxy
@@ -100,4 +100,14 @@ $ minikube dashboard
 ```sh
 # Creating cluster with k3d
 $ k3d cluster create myapps --servers 1 -p "30000:30000@loadbalancer"
+```
+
+### Applying manifests
+
+```sh
+$ cd project
+$ kubectl apply -f k8s
+
+$ kubectl delete svc broker-service
+$ kubectl expose deployment broker-service --type=LoadBalancer --port=8080 --target-port=8080
 ```

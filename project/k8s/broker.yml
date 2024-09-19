@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: broker-service
-          image: obededoreto/broker-service:1.0.0
+          image: obededoreto/broker-service:1.0.2
           resources:
             requests:
               memory: "64Mi"
@@ -30,7 +30,7 @@ spec:
             - name: LOGGER_SERVICE_URL
               value: "http://logger-service"
             - name: MAIL_SERVICE_URL
-              value: "http://mail-service"
+              value: "http://mailer-service"
             - name: RABBITMQ_URL
               value: amqp://guest:guest@rabbit:5672/
           ports:
