@@ -93,6 +93,9 @@ $ minikube start
 
 # Enable minikube dashboard
 $ minikube dashboard
+
+# Enable ingress
+$ minikube addons enable ingress
 ```
 
 1. Creating a cluster (local) with k3d
