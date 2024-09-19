@@ -114,3 +114,11 @@ $ kubectl apply -f k8s
 $ kubectl delete svc broker-service
 $ kubectl expose deployment broker-service --type=LoadBalancer --port=8080 --target-port=8080
 ```
+
+### Resource Guides
+
+1. Devops cube
+
+```
+https://devopscube.com/configure-ingress-tls-kubernetes/
+```
