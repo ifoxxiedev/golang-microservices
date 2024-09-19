@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentication-service
+  labels:
+    app: authentication-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentication-service
+  template:
+    metadata:
+      labels:
+        app: authentication-service
+    spec:
+      containers:
+        - name: "authentication-service"
+          image: obededoreto/authentication-service:1.0.0
+          env:
+            - name: LOGGER_SERVICE_URL
+              value: "http://logger-service"
+            - name: DSN
+              # Just appply it if your are using minikube and the postgres is running on your local machine
+              # host=host.minikube.internal
+              value: "host=postgres port=5432 dbname=users user=postgres password=password sslmode=disable timezone=UTC connect_timeout=5"
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentication-service
+spec:
+  selector:
+    app: authentication-service
+  ports:
+    - protocol: TCP
+      name: main-port
+      port: 80
+      targetPort: 80
+    - protocol: TCP
+      name: second-port
+      port: 8080
+      targetPort: 80
+  type: ClusterIP
